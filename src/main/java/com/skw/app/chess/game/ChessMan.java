@@ -78,6 +78,9 @@ public class ChessMan {
 
 	@Override
 	public String toString() {
+		if (!alive) {
+			return "X";
+		}
 		switch (role) {
 		case SHI:
 			return color == ChessColor.RED ? "仕" : "士";
@@ -94,7 +97,7 @@ public class ChessMan {
 		case SHUAI:
 			return color == ChessColor.RED ? "帥" : "将";
 		default:
-			return "X";
+			return "?";
 		}
 	}
 
@@ -121,27 +124,74 @@ public class ChessMan {
 	}
 	
 	// public setters
-	public void moveTo(int x, int y) {
-		if (alive) {
-			currGlobalPosition.update(x, y);
-		} else {
-			String msg = String.format(
-					"Cannot move dead %s to %s",
-					toDebugString(),
-					new GlobalPosition(x, y).toString());
-			throw new IllegalStateException(msg);
-		}
+	public boolean canMoveTo(GlobalPosition dst) {
+		return alive && isValidPosition(dst);
 	}
-	
+
+	public void moveTo(GlobalPosition dst) {
+		currGlobalPosition.update(dst.getX(), dst.getY());
+	}
+
 	public void setKilled() {
 		if (!alive) {
 			throw new IllegalStateException("The " + toDebugString() + "already dead");
 		}
-		currGlobalPosition.update(-1, -1);
 		alive = false;
 	}
 	
 	// helpers
+
+	public boolean isValidPosition(GlobalPosition position) {
+		int px = position.getX();
+		int py = position.getY();
+		switch (this.role) {
+		case SHI:
+			if (color == ChessColor.BLACK) {
+				py = Playground.height - 1 - py;
+			}
+			if (py == 0 || py == 2) {
+				return px == 3 || px == 5;
+			} else if (py == 1) {
+				return px == 4;
+			} else {
+				return false;
+			}
+		case XIANG:
+			if (color == ChessColor.BLACK) {
+				py = Playground.height - 1 - py;
+			}
+			if (py == 0 || py == 4) {
+				return px == 2 || px == 6;
+			} else if (py == 2) {
+				return px == 0 || px == 4 || px == 8;
+			} else {
+				return false;
+			}
+		case MA:
+		case JU:
+		case PAO:
+			return true;
+		case BING:
+			if (color == ChessColor.BLACK) {
+				py = Playground.height - 1 - py;
+			}
+			if (py < 3) {
+				return false;
+			} else if (py == 3 || py == 4) {
+				return px == 0 || px == 2 || px == 4 || px == 6 || px == 8;
+			} else {
+				return true;
+			}
+		case SHUAI:
+			if (color == ChessColor.BLACK) {
+				py = Playground.height - 1 - py;
+			}
+			return px >= 3 && px <= 5 && py >= 0 && py <= 2;
+		default:
+			return false;
+		}
+	}
+
 	private int getInitGlobalPositionX() {
 		int[] MIRRORED_X = new int[] {3, 5, 2, 6, 1, 7, 0, 8, 1, 7, 0, 2, 4, 6, 8, 4};
 		int mirroredId = id % (TOTAL_CHESS_CNT / 2);
@@ -165,7 +215,8 @@ public class ChessMan {
 
 /**
  * Global position of chessman. In red player's view, bottom-left is (0, 0), a red JU.
- * The chess board's indexing is also using this rule. 
+ * The chess board's indexing is also using this rule.
+ * The position should never be out of the chess board.
  * @author ksun
  *
  */
@@ -176,7 +227,7 @@ class GlobalPosition {
 	public GlobalPosition(int x, int y) {
 		update(x, y);
 	}
-	
+
 	public int getX() {
 		return x;
 	}
@@ -195,15 +246,20 @@ class GlobalPosition {
 	public String toString() {
 		return String.format("(%d, %d)", x, y);
 	}
-	private void validate(int x, int y) {
-		if (x < 0 && y < 0) {
-			//dead chessman
-			return;
+
+	@Override
+	public boolean equals(Object other) {
+		if (!(other instanceof GlobalPosition)) {
+			return false;
 		}
+		GlobalPosition otherPosi = (GlobalPosition) other;
+		return this.x == otherPosi.getX() && this.y == otherPosi.getY();
+	}
+
+	private void validate(int x, int y) {
 		if (x < 0 || x > Playground.width - 1 || y < 0 || y > Playground.height - 1) {
 			String msg = String.format("Illegal global position x = %d, y = %d", x, y);
 			throw new IllegalArgumentException(msg);
 		}
 	}
-	
 }

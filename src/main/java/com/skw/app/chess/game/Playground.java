@@ -11,14 +11,35 @@ public class Playground {
 		for (int x = 0; x < width; x++) {
 			board[x] = new ChessMan[height];
 		}
-		for (int chessman_id = 0; chessman_id < ChessMan.TOTAL_CHESS_CNT; chessman_id++) {
-			ChessMan chessman = new ChessMan(chessman_id);
+		for (int chessmanId = 0; chessmanId < ChessMan.TOTAL_CHESS_CNT; chessmanId++) {
+			ChessMan chessman = new ChessMan(chessmanId);
 			GlobalPosition globalPosition = chessman.getGlobalPosition();
-			chessmen[chessman_id] = chessman;
+			chessmen[chessmanId] = chessman;
 			board[globalPosition.getX()][globalPosition.getY()] = chessman;
 		}
 	}
 	
+	public void move(int chessmanId, GlobalPosition dst) {
+		ChessMan chessMan = chessmen[chessmanId];
+		if (!chessMan.canMoveTo(dst)) {
+			String msg = String.format("Cannot move %s%s from %s to %s",
+					chessMan.isAlive()? "" : "dead ",
+					chessMan.toDebugString(),
+					chessMan.getGlobalPosition().toString(),
+					dst.toString());
+			throw new IllegalStateException(msg);
+		}
+		GlobalPosition src = chessMan.getGlobalPosition();
+		if (board[dst.getX()][dst.getY()] != null) {
+			board[dst.getX()][dst.getY()].setKilled();
+		}
+		board[dst.getX()][dst.getY()] = chessMan;
+		if (chessMan.isAlive()) {				// dead chessman might be moved to undo an earlier move.
+			board[src.getX()][src.getY()] = null;
+		}
+		chessMan.moveTo(dst);
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -41,6 +62,10 @@ public class Playground {
 
 	private static void test() {
 		Playground playground = new Playground();
+		System.out.println(playground);
+		GlobalPosition dst = new GlobalPosition(4, 1);
+		playground.move(0, dst);
+		playground.move(31, new GlobalPosition(5, 7));
 		System.out.println(playground);
 	}
 }
