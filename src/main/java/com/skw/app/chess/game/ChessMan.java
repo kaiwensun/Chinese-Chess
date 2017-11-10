@@ -31,11 +31,11 @@ public class ChessMan {
 		 * @return ChessRole
 		 */
 		private static ChessRole id2Role(int id) { 
-			int mirrored_id = id % (TOTAL_CHESS_CNT / 2);
-			if (mirrored_id == 15) {
+			int mirroredId = id % (TOTAL_CHESS_CNT / 2);
+			if (mirroredId == 15) {
 				return ChessRole.SHUAI;
 			}
-			switch (mirrored_id / 2) {
+			switch (mirroredId / 2) {
 			case 0:
 				return ChessRole.SHI;
 			case 1:
@@ -57,60 +57,22 @@ public class ChessMan {
 		}
 	}
 
-	class GlobalPosition {
-		private int x;
-		private int y;
-
-		public GlobalPosition(int x, int y) {
-			update(x, y);
-		}
-		
-		public int getX() {
-			return x;
-		}
-		
-		public int getY() {
-			return y;
-		}
-		
-		public void update(int x, int y) {
-			validate(x, y);
-			this.x = x;
-			this.y = y;
-		}
-
-		@Override
-		public String toString() {
-			return String.format("(%d, %d)", x, y);
-		}
-		private void validate(int x, int y) {
-			if (x < 0 && y < 0) {
-				//dead chessman
-				return;
-			}
-			if (x < 0 || x > 8 || y < 0 || y > 9) {
-				String msg = String.format("Illegal global position x = %d, y = %d", x, y);
-				throw new IllegalArgumentException(msg);
-			}
-		}
-		
-	}
-	private static final int TOTAL_CHESS_CNT = 32;
+	public static final int TOTAL_CHESS_CNT = 32;
 	private final ChessColor color;
 	private final ChessRole role;
 	private final int id;						// 0 to 31 inclusive
-	private final GlobalPosition init_global_position; 
-	private final GlobalPosition curr_global_position;
+	private final GlobalPosition initGlobalPosition; 
+	private final GlobalPosition currGlobalPosition;
 	private boolean alive = true;
 
 	public ChessMan(int id) {
 		this.id = id;
 		this.color = ChessColor.id2Color(id);
 		this.role = ChessRole.id2Role(id);
-		this.init_global_position = new GlobalPosition(getInitGlobalPositionX(), getInitGlobalPositionY());
-		this.curr_global_position = new GlobalPosition(
-				init_global_position.getX(),
-				init_global_position.getY());
+		this.initGlobalPosition = new GlobalPosition(getInitGlobalPositionX(), getInitGlobalPositionY());
+		this.currGlobalPosition = new GlobalPosition(
+				initGlobalPosition.getX(),
+				initGlobalPosition.getY());
 		this.alive = true;
 	}
 
@@ -129,6 +91,8 @@ public class ChessMan {
 			return color == ChessColor.RED ? "炮" : "砲";
 		case BING:
 			return color == ChessColor.RED ? "兵" : "卒";
+		case SHUAI:
+			return color == ChessColor.RED ? "帥" : "将";
 		default:
 			return "X";
 		}
@@ -153,13 +117,13 @@ public class ChessMan {
 	}
 
 	public GlobalPosition getGlobalPosition() {
-		return new GlobalPosition(curr_global_position.getX(), curr_global_position.getY());
+		return new GlobalPosition(currGlobalPosition.getX(), currGlobalPosition.getY());
 	}
 	
 	// public setters
 	public void moveTo(int x, int y) {
 		if (alive) {
-			curr_global_position.update(x, y);
+			currGlobalPosition.update(x, y);
 		} else {
 			String msg = String.format(
 					"Cannot move dead %s to %s",
@@ -173,28 +137,73 @@ public class ChessMan {
 		if (!alive) {
 			throw new IllegalStateException("The " + toDebugString() + "already dead");
 		}
-		curr_global_position.update(-1, -1);
+		currGlobalPosition.update(-1, -1);
 		alive = false;
 	}
 	
 	// helpers
 	private int getInitGlobalPositionX() {
 		int[] MIRRORED_X = new int[] {3, 5, 2, 6, 1, 7, 0, 8, 1, 7, 0, 2, 4, 6, 8, 4};
-		int mirrored_id = id % (TOTAL_CHESS_CNT / 2);
-		return MIRRORED_X[mirrored_id];
+		int mirroredId = id % (TOTAL_CHESS_CNT / 2);
+		return MIRRORED_X[mirroredId];
 	}
 
 	private int getInitGlobalPositionY() {
-		int mirrored_id = id % (TOTAL_CHESS_CNT / 2);
+		int mirroredId = id % (TOTAL_CHESS_CNT / 2);
 		int[] MIRRORED_Y = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 3, 3, 3, 3, 3, 0};
-		if (id == mirrored_id) {
-			return MIRRORED_Y[mirrored_id];
+		if (id == mirroredId) {
+			return MIRRORED_Y[mirroredId];
 		} else {
-			return MIRRORED_Y[9 - mirrored_id];
+			return Playground.height - 1 - MIRRORED_Y[mirroredId];
 		}
 	}
 	
 	protected String toDebugString() {
 		return "" + color + toString() + "(" + id + ")";
 	}
+}
+
+/**
+ * Global position of chessman. In red player's view, bottom-left is (0, 0), a red JU.
+ * The chess board's indexing is also using this rule. 
+ * @author ksun
+ *
+ */
+class GlobalPosition {
+	private int x;
+	private int y;
+
+	public GlobalPosition(int x, int y) {
+		update(x, y);
+	}
+	
+	public int getX() {
+		return x;
+	}
+	
+	public int getY() {
+		return y;
+	}
+	
+	public void update(int x, int y) {
+		validate(x, y);
+		this.x = x;
+		this.y = y;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("(%d, %d)", x, y);
+	}
+	private void validate(int x, int y) {
+		if (x < 0 && y < 0) {
+			//dead chessman
+			return;
+		}
+		if (x < 0 || x > Playground.width - 1 || y < 0 || y > Playground.height - 1) {
+			String msg = String.format("Illegal global position x = %d, y = %d", x, y);
+			throw new IllegalArgumentException(msg);
+		}
+	}
+	
 }
