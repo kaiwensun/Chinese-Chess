@@ -1,5 +1,7 @@
 package com.skw.app.chess.game;
 
+import java.util.Scanner;
+
 public class Playground {
 	private ChessMan[][] board;
 	public static final int width = 9;
@@ -19,15 +21,33 @@ public class Playground {
 		}
 	}
 	
+	public ChessMan getChessMan(GlobalPosition position) {
+		return board[position.getX()][position.getY()];
+	}
+
+	public ChessMan getChessMan(int chessmanId) {
+		if (chessmanId < 0 || chessmanId >= ChessMan.TOTAL_CHESS_CNT) {
+			return null;
+		}
+		return chessmen[chessmanId];
+	}
+
 	public void move(int chessmanId, GlobalPosition dst) {
 		ChessMan chessMan = chessmen[chessmanId];
-		if (!chessMan.canMoveTo(dst)) {
-			String msg = String.format("Cannot move %s%s from %s to %s",
+		if (!chessMan.canExistAt(dst)) {
+			String msg = String.format("%s%s cannot exist at %s",
+					chessMan.isAlive()? "" : "dead ",
+					chessMan.toDebugString(),
+					dst.toString());
+			throw new IllegalChessMoveException(msg);
+		}
+		if(!chessMan.canReach(dst, this)) {
+			String msg = String.format("%s%s can not reach from %s to %s",
 					chessMan.isAlive()? "" : "dead ",
 					chessMan.toDebugString(),
 					chessMan.getGlobalPosition().toString(),
 					dst.toString());
-			throw new IllegalStateException(msg);
+			throw new IllegalChessMoveException(msg);
 		}
 		GlobalPosition src = chessMan.getGlobalPosition();
 		if (board[dst.getX()][dst.getY()] != null) {
@@ -42,8 +62,15 @@ public class Playground {
 
 	@Override
 	public String toString() {
+		return toString(false);
+	}
+
+	public String toString(boolean coordinate) {
 		StringBuilder sb = new StringBuilder();
 		for (int y = height - 1; y >= 0; y--) {
+			if (coordinate) {
+				sb.append(y + " ");
+			}
 			for (int x = 0; x < width; x++) {
 				if (board[x][y] != null) {
 					sb.append(board[x][y].toString());
@@ -51,6 +78,10 @@ public class Playground {
 					sb.append('十');
 				}
 			}
+			sb.append(String.format("%n"));
+		}
+		if (coordinate) {
+			sb.append("  〇一二三四五六七八");
 			sb.append(String.format("%n"));
 		}
 		return sb.toString();
@@ -61,14 +92,61 @@ public class Playground {
 	}
 
 	private static void test() {
-		Playground playground = new Playground();
-		System.out.println(playground);
-		GlobalPosition dst = new GlobalPosition(4, 1);
-		playground.move(0, dst);
-		playground.move(31, new GlobalPosition(5, 7));
-		System.out.println(playground);
+		new ManualTester();
 	}
 }
 
+class IllegalChessMoveException extends IllegalStateException {
+	private static final long serialVersionUID = 4472797180478847001L;
+	public IllegalChessMoveException() {
+		super();
+	}
+	public IllegalChessMoveException(String msg) {
+		super(msg);
+	}
+}
+class ManualTester {
+	private Playground playground;
+	Scanner sc;
+	public ManualTester() {
+		playground = new Playground();
+		sc = new Scanner(System.in);
+		run();
+		sc.close();
+	}
 
-
+	private void run() {
+		System.out.println("Test begins");
+		while(sc.hasNextLine()) {
+			try {
+				String cmd = sc.nextLine();
+				String[] slices = cmd.trim().split("\\s+");
+				if (slices.length == 4 && slices[0].equals("move")) {
+					int chessmanId = Integer.parseInt(slices[1]);
+					int dstX = Integer.parseInt(slices[2]);
+					int dstY = Integer.parseInt(slices[3]);
+					playground.move(chessmanId, new GlobalPosition(dstX, dstY));
+					System.out.println(playground.toString(true));
+				} else if (slices.length == 3 && slices[0].equals("whatis")) {
+					int x = Integer.parseInt(slices[1]);
+					int y = Integer.parseInt(slices[2]);
+					ChessMan chessMan = playground.getChessMan(new GlobalPosition(x, y));
+					if (chessMan != null) {
+						System.out.println(chessMan.toDebugString());
+					} else {
+						System.out.println(chessMan);
+					}
+				} else if (slices.length == 1 && slices[0].equals("exit")) {
+					break;
+				} else if (slices.length == 1 && slices[0].equals("show")) {
+					System.out.println(playground.toString(true));
+				} else {
+					System.out.println("Unknown cmd");
+				}
+			} catch (IllegalChessMoveException e) {
+				System.err.println(e.getMessage());
+			}
+		}
+		System.out.println("Test ends");
+	}
+}

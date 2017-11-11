@@ -124,7 +124,7 @@ public class ChessMan {
 	}
 	
 	// public setters
-	public boolean canMoveTo(GlobalPosition dst) {
+	public boolean canExistAt(GlobalPosition dst) {
 		return alive && isValidPosition(dst);
 	}
 
@@ -144,11 +144,11 @@ public class ChessMan {
 	public boolean isValidPosition(GlobalPosition position) {
 		int px = position.getX();
 		int py = position.getY();
+		if (color == ChessColor.BLACK) {
+			py = Playground.height - 1 - py;
+		}
 		switch (this.role) {
 		case SHI:
-			if (color == ChessColor.BLACK) {
-				py = Playground.height - 1 - py;
-			}
 			if (py == 0 || py == 2) {
 				return px == 3 || px == 5;
 			} else if (py == 1) {
@@ -157,9 +157,6 @@ public class ChessMan {
 				return false;
 			}
 		case XIANG:
-			if (color == ChessColor.BLACK) {
-				py = Playground.height - 1 - py;
-			}
 			if (py == 0 || py == 4) {
 				return px == 2 || px == 6;
 			} else if (py == 2) {
@@ -172,9 +169,6 @@ public class ChessMan {
 		case PAO:
 			return true;
 		case BING:
-			if (color == ChessColor.BLACK) {
-				py = Playground.height - 1 - py;
-			}
 			if (py < 3) {
 				return false;
 			} else if (py == 3 || py == 4) {
@@ -183,15 +177,136 @@ public class ChessMan {
 				return true;
 			}
 		case SHUAI:
-			if (color == ChessColor.BLACK) {
-				py = Playground.height - 1 - py;
-			}
 			return px >= 3 && px <= 5 && py >= 0 && py <= 2;
 		default:
 			return false;
 		}
 	}
 
+	/**
+	 * This considers only the step direction and length of chessman.
+	 * This considers the restrictions on MA, XIANG, JU, PAO, BING.
+	 * This does not consider if the dst position is valid for the chessman.
+	 * ChessMan cannot go to a position occupied by a friend chessman.
+	 * ChessMan cannot stay at the current position.
+	 * @param dst
+	 * @param playground
+	 * @return reachable
+	 */
+	public boolean canReach(GlobalPosition dst, Playground playground) {
+		if (playground.getChessMan(dst) != null && playground.getChessMan(dst).getColor() == this.color) {
+			return false;
+		}
+		int srcX = currGlobalPosition.getX();
+		int srcY = currGlobalPosition.getY();
+		int dstX = dst.getX();
+		int dstY = dst.getY();
+		if (color == ChessColor.BLACK) {
+			srcY = Playground.height - 1 - srcY;
+			dstY = Playground.height - 1 - dstY;
+		}
+		int diffX = Math.abs(dstX - srcX);
+		int diffY = Math.abs(dstY - srcY);
+		switch (role) {
+		case SHI:
+			return diffX == 1 && diffY == 1;
+		case XIANG:
+			return diffX == 2 && diffY == 2;
+		case MA:
+			if (!((diffX | diffY) == 3 && (diffX & diffY) == 0)) {
+				return false;
+			}
+			GlobalPosition blocker = null;
+			if (diffX == 2) {
+				blocker = new GlobalPosition(
+						currGlobalPosition.getY(),
+						(currGlobalPosition.getX() + dst.getX()) / 2);
+			} else {
+				blocker = new GlobalPosition(
+						currGlobalPosition.getX(),
+						(currGlobalPosition.getY() + dst.getY()) / 2);
+			}
+			return playground.getChessMan(blocker) == null;
+		case JU:
+			if (!(diffX == 0 || diffY == 0)) {
+				return false;
+			}
+			if (diffX == 0) {
+				int smallY = Math.min(currGlobalPosition.getY(), dst.getY());
+				int bigY = Math.max(currGlobalPosition.getY(), dst.getY());
+				for (int stepY = smallY + 1; stepY < bigY; stepY++) {
+					GlobalPosition stepPosition = new GlobalPosition(srcX, stepY);
+					if (playground.getChessMan(stepPosition) != null) {
+						return false;
+					}
+				}
+			} else {
+				int smallX = Math.min(srcX, dstX);
+				int bigX = Math.max(srcX, dstX);
+				for (int stepX = smallX + 1; stepX < bigX; stepX++) {
+					GlobalPosition stepPosition = new GlobalPosition(stepX, dst.getY());
+					if (playground.getChessMan(stepPosition) != null) {
+						return false;
+					}
+				}
+			}
+			return true;
+		case PAO:
+			if (!(diffX == 0 || diffY == 0)) {
+				return false;
+			}
+			if (playground.getChessMan(dst) == null) {
+				if (diffX == 0) {
+					int smallY = Math.min(currGlobalPosition.getY(), dst.getY());
+					int bigY = Math.max(currGlobalPosition.getY(), dst.getY());
+					for (int stepY = smallY + 1; stepY < bigY; stepY++) {
+						GlobalPosition stepPosition = new GlobalPosition(srcX, stepY);
+						if (playground.getChessMan(stepPosition) != null) {
+							return false;
+						}
+					}
+				} else {
+					int smallX = Math.min(srcX, dstX);
+					int bigX = Math.max(srcX, dstX);
+					for (int stepX = smallX + 1; stepX < bigX; stepX++) {
+						GlobalPosition stepPosition = new GlobalPosition(stepX, dst.getY());
+						if (playground.getChessMan(stepPosition) != null) {
+							return false;
+						}
+					}
+				}
+				return true;
+			} else {
+				int blockerCnt = 0;
+				if (diffX == 0) {
+					int smallY = Math.min(currGlobalPosition.getY(), dst.getY());
+					int bigY = Math.max(currGlobalPosition.getY(), dst.getY());
+					for (int stepY = smallY + 1; stepY < bigY; stepY++) {
+						GlobalPosition stepPosition = new GlobalPosition(srcX, stepY);
+						if (playground.getChessMan(stepPosition) != null) {
+							blockerCnt++;
+						}
+					}
+				} else {
+					int smallX = Math.min(srcX, dstX);
+					int bigX = Math.max(srcX, dstX);
+					for (int stepX = smallX + 1; stepX < bigX; stepX++) {
+						GlobalPosition stepPosition = new GlobalPosition(stepX, dst.getY());
+						if (playground.getChessMan(stepPosition) != null) {
+							blockerCnt++;
+						}
+					}
+				}
+				return blockerCnt == 1;
+			}
+		case BING:
+			return diffX + diffY == 1 && dstY >= srcY;
+		case SHUAI:
+			return diffX + diffY == 1;
+		default:
+			return false;
+		}
+	}
 	private int getInitGlobalPositionX() {
 		int[] MIRRORED_X = new int[] {3, 5, 2, 6, 1, 7, 0, 8, 1, 7, 0, 2, 4, 6, 8, 4};
 		int mirroredId = id % (TOTAL_CHESS_CNT / 2);
