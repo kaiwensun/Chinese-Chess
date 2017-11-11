@@ -24,19 +24,19 @@ public class MyResource {
     public String getIt() {
         return "Got it!";
     }
-    
-    
+
+
     @GET
     @Path("extension")
     @Produces(MediaType.TEXT_PLAIN)
     public String extension() {
-    		return "extension Got it!";
+        return "extension Got it!";
     }
-    
+
     @GET
     @Path("extension/{id}")
     @Produces(MediaType.TEXT_PLAIN)
     public String insertId(@PathParam("id") String id, @QueryParam("name") String name) {
-    		return "extension Got it! name = " + name + " and id = " + id; 
+        return "extension Got it! name = " + name + " and id = " + id;
     }
 }
