@@ -87,7 +87,7 @@ public class Playground {
         return sb.toString();
     }
 
-    public static void main(String[] argv) {
+    public static void main(String[] args) {
         test();
     }
 
