@@ -24,10 +24,12 @@ public class ChessMan {
         SHI, XIANG, MA, JU, PAO, BING, SHUAI;
 
         /**
-         * Convert id to ChessRole. From 0 to 15, the roles are
-         * [SHI, SHI, XIANG, XIANG, MA, MA, JU, JU, PAO, PAO, BING, BING, BING, BING, BING, SHUAI].
-         * Same with 16 to 31.
-         * @param id 0 to 31
+         * Convert id to ChessRole. From 0 to 15, the roles are [SHI, SHI, XIANG, XIANG,
+         * MA, MA, JU, JU, PAO, PAO, BING, BING, BING, BING, BING, SHUAI]. Same with 16
+         * to 31.
+         * 
+         * @param id
+         *            0 to 31
          * @return ChessRole
          */
         private static ChessRole id2Role(int id) {
@@ -60,7 +62,7 @@ public class ChessMan {
     public static final int TOTAL_CHESS_CNT = 32;
     private final ChessColor color;
     private final ChessRole role;
-    private final int id;                        // 0 to 31 inclusive
+    private final int id; // 0 to 31 inclusive
     private final GlobalPosition initGlobalPosition;
     private final GlobalPosition currGlobalPosition;
     private boolean alive = true;
@@ -70,9 +72,7 @@ public class ChessMan {
         this.color = ChessColor.id2Color(id);
         this.role = ChessRole.id2Role(id);
         this.initGlobalPosition = new GlobalPosition(getInitGlobalPositionX(), getInitGlobalPositionY());
-        this.currGlobalPosition = new GlobalPosition(
-                initGlobalPosition.getX(),
-                initGlobalPosition.getY());
+        this.currGlobalPosition = new GlobalPosition(initGlobalPosition.getX(), initGlobalPosition.getY());
         this.alive = true;
     }
 
@@ -184,11 +184,11 @@ public class ChessMan {
     }
 
     /**
-     * This considers only the step direction and length of chessman.
-     * This considers the restrictions on MA, XIANG, JU, PAO, BING.
-     * This does not consider if the dst position is valid for the chessman.
-     * ChessMan cannot go to a position occupied by a friend chessman.
-     * ChessMan cannot stay at the current position.
+     * This considers only the step direction and length of chessman. This considers
+     * the restrictions on MA, XIANG, JU, PAO, BING. This does not consider if the
+     * dst position is valid for the chessman. ChessMan cannot go to a position
+     * occupied by a friend chessman. ChessMan cannot stay at the current position.
+     * 
      * @param dst
      * @param playground
      * @return reachable
@@ -218,13 +218,9 @@ public class ChessMan {
             }
             GlobalPosition blocker = null;
             if (diffX == 2) {
-                blocker = new GlobalPosition(
-                        currGlobalPosition.getY(),
-                        (currGlobalPosition.getX() + dst.getX()) / 2);
+                blocker = new GlobalPosition(currGlobalPosition.getY(), (currGlobalPosition.getX() + dst.getX()) / 2);
             } else {
-                blocker = new GlobalPosition(
-                        currGlobalPosition.getX(),
-                        (currGlobalPosition.getY() + dst.getY()) / 2);
+                blocker = new GlobalPosition(currGlobalPosition.getX(), (currGlobalPosition.getY() + dst.getY()) / 2);
             }
             return playground.getChessMan(blocker) == null;
         case JU:
@@ -307,15 +303,16 @@ public class ChessMan {
             return false;
         }
     }
+
     private int getInitGlobalPositionX() {
-        int[] MIRRORED_X = new int[] {3, 5, 2, 6, 1, 7, 0, 8, 1, 7, 0, 2, 4, 6, 8, 4};
+        int[] MIRRORED_X = new int[] { 3, 5, 2, 6, 1, 7, 0, 8, 1, 7, 0, 2, 4, 6, 8, 4 };
         int mirroredId = id % (TOTAL_CHESS_CNT / 2);
         return MIRRORED_X[mirroredId];
     }
 
     private int getInitGlobalPositionY() {
         int mirroredId = id % (TOTAL_CHESS_CNT / 2);
-        int[] MIRRORED_Y = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 3, 3, 3, 3, 3, 0};
+        int[] MIRRORED_Y = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 3, 3, 3, 3, 3, 0 };
         if (id == mirroredId) {
             return MIRRORED_Y[mirroredId];
         } else {
@@ -329,9 +326,10 @@ public class ChessMan {
 }
 
 /**
- * Global position of chessman. In red player's view, bottom-left is (0, 0), a red JU.
- * The chess board's indexing is also using this rule.
- * The position should never be out of the chess board.
+ * Global position of chessman. In red player's view, bottom-left is (0, 0), a
+ * red JU. The chess board's indexing is also using this rule. The position
+ * should never be out of the chess board.
+ * 
  * @author ksun
  *
  */

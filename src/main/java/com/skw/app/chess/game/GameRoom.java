@@ -23,9 +23,11 @@ public class GameRoom {
     public String getRoomId() {
         return roomId.toString();
     }
+
     public int getCurrPlayerIndex() {
         return currPlayerIndex;
     }
+
     private Player getPlayerByPlayerId(String playerId) {
         for (int index = 0; index < 2; index++) {
             if (players[index] != null && players[index].getId().equals(playerId)) {
@@ -52,7 +54,7 @@ public class GameRoom {
             return false;
         } else {
             synchronized (joinGameLock) {
-                if(players[1] != null) {
+                if (players[1] != null) {
                     return false;
                 } else {
                     players[1] = visitingPlayer;
@@ -67,9 +69,7 @@ public class GameRoom {
         Player player = getPlayerByPlayerId(playerId);
         ChessMan chessMan = playground.getChessMan(chessmanId);
         if (!chessMan.getColor().equals(player.getColor())) {
-            String msg = String.format("%s player %s is not allowed to move %s",
-                    player.getColor(),
-                    player.toString(),
+            String msg = String.format("%s player %s is not allowed to move %s", player.getColor(), player.toString(),
                     chessMan.toDebugString());
             throw new IllegalChessMoveException(msg);
         }

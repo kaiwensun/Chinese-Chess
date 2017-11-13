@@ -13,20 +13,25 @@ public class Player {
         this.isHost = isHost;
         this.id = UUID.randomUUID();
     }
+
     public String getName() {
         return this.name;
     };
+
     public String getId() {
         return this.id.toString();
     };
+
     public boolean isHost() {
         return isHost;
     }
+
     public ChessMan.ChessColor getColor() {
         return color;
     }
 
     private Object setColorLock = new Object();
+
     public void setColor(ChessMan.ChessColor color) {
         if (this.color != null) {
             return;
@@ -42,6 +47,7 @@ public class Player {
     public boolean equals(Object other) {
         return (other instanceof Player) && ((Player) other).getId().equals(this.id);
     }
+
     @Override
     public String toString() {
         return name;
