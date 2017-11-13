@@ -17,7 +17,6 @@ import com.skw.app.chess.game.User;
 @Path("api/v1")
 public class MyResource {
 
-
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
@@ -70,7 +69,7 @@ public class MyResource {
         User user = new User();
         return user;
     }
-    
+
     @GET
     @Path("ping")
     public String getServerTime() {
@@ -78,48 +77,3 @@ public class MyResource {
     }
 
 }
-
-/*
- * $.ajax( {    
-            url:'http://skwapp.org:8080/chessgame/api/v1/ping?name=3',// 跳转到 action
-            type:'get',    
-            cache:false,    
-            
-            success:function(data) {    
-                
-                    console.log(data);    
-                
-             },    
-             error : function(e) {    
-                  alert("异常！");    
-             }    
-        });  
-        */
-
-/*
- * $.ajax({
-    type: 'POST',
-    url: 'http://skwapp.org:8080/chessgame/api/v1/getUserJson',
-    data: '{"name":"jonas"}', // or JSON.stringify ({name: 'jonas'}),
-    success: function(data) { alert('data: ' + data); },
-    contentType: "application/json",
-    dataType: 'json'
-});
-*/
-/*
-$.ajax( {    
-            url:'http://skwapp.org:8080/chessgame/api/v1/getUserJson',// 跳转到 action
-            type:'post',        
-            data: '{"name":"jonas"}',
-            contentType: "application/json",
-            dataType: 'json',
-            success:function(data) {    
-                
-                    console.log(data);    
-                
-             },    
-             error : function(e) {    
-                  alert("异常！");    
-             }    
-        });  
-*/
