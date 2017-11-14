@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import com.skw.app.chess.game.ChessMan.ChessColor;
 
-public class GameRoom {
+public class Match {
     private static Random rg = new Random();
     private Player[] players = new Player[2];
     private UUID roomId;
@@ -14,7 +14,7 @@ public class GameRoom {
 
     private Object joinGameLock = new Object();
 
-    public GameRoom(Player hostPlayer) {
+    public Match(Player hostPlayer) {
         players[0] = hostPlayer;
         roomId = UUID.randomUUID();
     }
