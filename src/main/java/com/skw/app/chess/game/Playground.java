@@ -3,10 +3,10 @@ package com.skw.app.chess.game;
 import java.util.Scanner;
 
 public class Playground {
-    private ChessMan[][] board;
-    public static final int width = 9;
-    public static final int height = 10;
-    private ChessMan[] chessmen = new ChessMan[ChessMan.TOTAL_CHESS_CNT];
+    private ChessMan[][]    board;
+    public static final int width    = 9;
+    public static final int height   = 10;
+    private ChessMan[]      chessmen = new ChessMan[ChessMan.TOTAL_CHESS_CNT];
 
     public Playground() {
         board = new ChessMan[width][];
@@ -36,17 +36,14 @@ public class Playground {
         ChessMan chessMan = chessmen[chessmanId];
         if (!chessMan.canExistAt(dst)) {
             String msg = String.format("%s%s cannot exist at %s",
-                    chessMan.isAlive()? "" : "dead ",
-                    chessMan.toDebugString(),
+                    chessMan.isAlive() ? "" : "dead ", chessMan.toDebugString(),
                     dst.toString());
             throw new IllegalChessMoveException(msg);
         }
-        if(!chessMan.canReach(dst, this)) {
+        if (!chessMan.canReach(dst, this)) {
             String msg = String.format("%s%s can not reach from %s to %s",
-                    chessMan.isAlive()? "" : "dead ",
-                    chessMan.toDebugString(),
-                    chessMan.getGlobalPosition().toString(),
-                    dst.toString());
+                    chessMan.isAlive() ? "" : "dead ", chessMan.toDebugString(),
+                    chessMan.getGlobalPosition().toString(), dst.toString());
             throw new IllegalChessMoveException(msg);
         }
         GlobalPosition src = chessMan.getGlobalPosition();
@@ -54,7 +51,8 @@ public class Playground {
             board[dst.getX()][dst.getY()].setKilled();
         }
         board[dst.getX()][dst.getY()] = chessMan;
-        if (chessMan.isAlive()) {                // dead chessman might be moved to undo an earlier move.
+        if (chessMan.isAlive()) { // dead chessman might be moved to undo an
+                                  // earlier move.
             board[src.getX()][src.getY()] = null;
         }
         chessMan.moveTo(dst);
@@ -81,7 +79,7 @@ public class Playground {
             sb.append(String.format("%n"));
         }
         if (coordinate) {
-            sb.append("  〇一二三四五六七八");
+            sb.append("- 〇一二三四五六七八");
             sb.append(String.format("%n"));
         }
         return sb.toString();
@@ -98,16 +96,20 @@ public class Playground {
 
 class IllegalChessMoveException extends IllegalStateException {
     private static final long serialVersionUID = 4472797180478847001L;
+
     public IllegalChessMoveException() {
         super();
     }
+
     public IllegalChessMoveException(String msg) {
         super(msg);
     }
 }
+
 class ManualTester {
     private Playground playground;
-    Scanner sc;
+    Scanner            sc;
+
     public ManualTester() {
         playground = new Playground();
         sc = new Scanner(System.in);
@@ -117,7 +119,7 @@ class ManualTester {
 
     private void run() {
         System.out.println("Test begins");
-        while(sc.hasNextLine()) {
+        while (sc.hasNextLine()) {
             try {
                 String cmd = sc.nextLine();
                 String[] slices = cmd.trim().split("\\s+");
@@ -130,7 +132,8 @@ class ManualTester {
                 } else if (slices.length == 3 && slices[0].equals("whatis")) {
                     int x = Integer.parseInt(slices[1]);
                     int y = Integer.parseInt(slices[2]);
-                    ChessMan chessMan = playground.getChessMan(new GlobalPosition(x, y));
+                    ChessMan chessMan = playground
+                            .getChessMan(new GlobalPosition(x, y));
                     if (chessMan != null) {
                         System.out.println(chessMan.toDebugString());
                     } else {

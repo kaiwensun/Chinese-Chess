@@ -12,7 +12,7 @@ import java.net.URI;
  *
  */
 public class Main {
-    public static final String BASE_URI = "http://192.168.0.86:8080/chessgame/";
+    public static final String BASE_URI = "http://192.168.0.91:8080/chessgame/";
 
     /**
      * Starts Grizzly HTTP server exposing JAX-RS resources defined in this
@@ -21,14 +21,17 @@ public class Main {
      * @return Grizzly HTTP server.
      */
     public static HttpServer startServer() {
-        // create a resource config that scans for JAX-RS resources and providers
+        // create a resource config that scans for JAX-RS resources and
+        // providers
         // in com.skw.app.chess package
-        final ResourceConfig rc = new ResourceConfig().packages("com.skw.app.chess");
+        final ResourceConfig rc = new ResourceConfig()
+                .packages("com.skw.app.chess");
         rc.register(CORSFilter.class);
 
         // create and start a new instance of grizzly http server
         // exposing the Jersey application at BASE_URI
-        return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
+        return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI),
+                rc);
     }
 
     /**
@@ -40,7 +43,8 @@ public class Main {
     public static void main(String[] args) throws IOException {
         final HttpServer server = startServer();
         System.out.println(String.format(
-                "Jersey app started with WADL available at " + "%sapplication.wadl\nHit enter to stop it...",
+                "Jersey app started with WADL available at "
+                        + "%sapplication.wadl\nHit enter to stop it...",
                 BASE_URI));
         System.in.read();
         server.shutdownNow();

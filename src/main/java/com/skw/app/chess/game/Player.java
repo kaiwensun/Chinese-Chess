@@ -3,10 +3,10 @@ package com.skw.app.chess.game;
 import java.util.UUID;
 
 public class Player {
-    private final String name;
-    private final UUID id;
+    private final String        name;
+    private final UUID          id;
     private ChessMan.ChessColor color = null;
-    private boolean isHost;
+    private boolean             isHost;
 
     public Player(String name, boolean isHost) {
         this.name = name;
@@ -45,7 +45,8 @@ public class Player {
 
     @Override
     public boolean equals(Object other) {
-        return (other instanceof Player) && ((Player) other).getId().equals(this.id);
+        return (other instanceof Player)
+                && ((Player) other).getId().equals(this.id);
     }
 
     @Override

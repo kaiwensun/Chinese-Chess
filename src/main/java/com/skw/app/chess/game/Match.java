@@ -5,23 +5,23 @@ import java.util.UUID;
 
 import com.skw.app.chess.game.ChessMan.ChessColor;
 
-public class GameRoom {
-    private static Random rg = new Random();
-    private Player[] players = new Player[2];
-    private UUID roomId;
-    private Playground playground;
-    private int currPlayerIndex = -1;
+public class Match {
+    private static Random rg              = new Random();
+    private Player[]      players         = new Player[2];
+    private UUID          matchId;
+    private Playground    playground;
+    private int           currPlayerIndex = -1;
 
-    private Object joinGameLock = new Object();
+    private Object        joinGameLock    = new Object();
 
-    public GameRoom(Player hostPlayer) {
+    public Match(Player hostPlayer) {
         players[0] = hostPlayer;
-        roomId = UUID.randomUUID();
+        matchId = UUID.randomUUID();
     }
 
     // getters
-    public String getRoomId() {
-        return roomId.toString();
+    public String getMatchId() {
+        return matchId.toString();
     }
 
     public int getCurrPlayerIndex() {
@@ -30,7 +30,8 @@ public class GameRoom {
 
     private Player getPlayerByPlayerId(String playerId) {
         for (int index = 0; index < 2; index++) {
-            if (players[index] != null && players[index].getId().equals(playerId)) {
+            if (players[index] != null
+                    && players[index].getId().equals(playerId)) {
                 return players[index];
             }
         }
@@ -38,7 +39,7 @@ public class GameRoom {
     }
 
     // actions
-    private void startGame() {
+    private synchronized void startGame() {
         playground = new Playground();
         boolean hostFirst = rg.nextBoolean();
         players[0].setColor(hostFirst ? ChessColor.RED : ChessColor.BLACK);
@@ -46,7 +47,7 @@ public class GameRoom {
         currPlayerIndex = hostFirst ? 0 : 1;
     }
 
-    public boolean joinGame(Player visitingPlayer) {
+    public synchronized boolean joinGame(Player visitingPlayer) {
         if (!players[0].equals(visitingPlayer)) {
             return false;
         }
@@ -65,13 +66,22 @@ public class GameRoom {
         return true;
     }
 
-    public void move(String playerId, int chessmanId, GlobalPosition position) {
+    public synchronized void move(String playerId, int chessmanId,
+            GlobalPosition position) {
+        if (!playerId.equals(players[currPlayerIndex].getId())) {
+            String msg = String.format("It is %s's turn now. Not %s's.",
+                    players[currPlayerIndex].getName(),
+                    players[(currPlayerIndex + 1) % 2].getName());
+            throw new IllegalChessMoveException(msg);
+        }
         Player player = getPlayerByPlayerId(playerId);
         ChessMan chessMan = playground.getChessMan(chessmanId);
         if (!chessMan.getColor().equals(player.getColor())) {
-            String msg = String.format("%s player %s is not allowed to move %s", player.getColor(), player.toString(),
+            String msg = String.format("%s player %s is not allowed to move %s",
+                    player.getColor(), player.toString(),
                     chessMan.toDebugString());
             throw new IllegalChessMoveException(msg);
         }
+        currPlayerIndex = (currPlayerIndex + 1) % 2;
     }
 }

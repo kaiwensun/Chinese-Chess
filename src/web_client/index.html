@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-
 <html lang="zh-CN">
+
 <head>
     <meta charset="utf-8">
     <meta name="description" content="Chinese Chess Game on Web">
@@ -8,18 +8,15 @@
     <meta name="author" content="Kaiwen Sun">
     <title>Hello World jQuery!</title>
     <script type="text/javascript" src="lib/jquery-3.2.1.js"></script>
-    <script type="text/javascript" src="js/common.js"></script>
-    <script type="text/javascript">
-        $(function() {
-            postToApi('getUserJson', {field1: 'number 1', field2: 'number 2'}, function(data) {
-                console.log(data);
-            });
-        });
-    </script>
+
+    <script type="text/javascript" src="js/commons.js"></script>
+    <script type="text/javascript" src="js/setup_api.js"></script>
 </head>
+
 <body>
     <div>
         Hello World!
     </div>
 </body>
+
 </html>
