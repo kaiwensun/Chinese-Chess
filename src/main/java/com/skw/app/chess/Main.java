@@ -12,7 +12,7 @@ import java.net.URI;
  *
  */
 public class Main {
-    public static final String BASE_URI = "http://192.168.0.86:8080/chessgame/";
+    public static final String BASE_URI = "http://192.168.0.91:8080/chessgame/";
 
     /**
      * Starts Grizzly HTTP server exposing JAX-RS resources defined in this
