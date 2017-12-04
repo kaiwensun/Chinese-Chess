@@ -24,9 +24,9 @@ public class ChessMan {
         SHI, XIANG, MA, JU, PAO, BING, SHUAI;
 
         /**
-         * Convert id to ChessRole. From 0 to 15, the roles are [SHI, SHI, XIANG, XIANG,
-         * MA, MA, JU, JU, PAO, PAO, BING, BING, BING, BING, BING, SHUAI]. Same with 16
-         * to 31.
+         * Convert id to ChessRole. From 0 to 15, the roles are [SHI, SHI,
+         * XIANG, XIANG, MA, MA, JU, JU, PAO, PAO, BING, BING, BING, BING, BING,
+         * SHUAI]. Same with 16 to 31.
          * 
          * @param id
          *            0 to 31
@@ -59,20 +59,22 @@ public class ChessMan {
         }
     }
 
-    public static final int TOTAL_CHESS_CNT = 32;
-    private final ChessColor color;
-    private final ChessRole role;
-    private final int id; // 0 to 31 inclusive
+    public static final int      TOTAL_CHESS_CNT = 32;
+    private final ChessColor     color;
+    private final ChessRole      role;
+    private final int            id;                    // 0 to 31 inclusive
     private final GlobalPosition initGlobalPosition;
     private final GlobalPosition currGlobalPosition;
-    private boolean alive = true;
+    private boolean              alive           = true;
 
     public ChessMan(int id) {
         this.id = id;
         this.color = ChessColor.id2Color(id);
         this.role = ChessRole.id2Role(id);
-        this.initGlobalPosition = new GlobalPosition(getInitGlobalPositionX(), getInitGlobalPositionY());
-        this.currGlobalPosition = new GlobalPosition(initGlobalPosition.getX(), initGlobalPosition.getY());
+        this.initGlobalPosition = new GlobalPosition(getInitGlobalPositionX(),
+                getInitGlobalPositionY());
+        this.currGlobalPosition = new GlobalPosition(initGlobalPosition.getX(),
+                initGlobalPosition.getY());
         this.alive = true;
     }
 
@@ -120,7 +122,8 @@ public class ChessMan {
     }
 
     public GlobalPosition getGlobalPosition() {
-        return new GlobalPosition(currGlobalPosition.getX(), currGlobalPosition.getY());
+        return new GlobalPosition(currGlobalPosition.getX(),
+                currGlobalPosition.getY());
     }
 
     // public setters
@@ -134,7 +137,8 @@ public class ChessMan {
 
     public void setKilled() {
         if (!alive) {
-            throw new IllegalStateException("The " + toDebugString() + "already dead");
+            throw new IllegalStateException(
+                    "The " + toDebugString() + "already dead");
         }
         alive = false;
     }
@@ -184,17 +188,19 @@ public class ChessMan {
     }
 
     /**
-     * This considers only the step direction and length of chessman. This considers
-     * the restrictions on MA, XIANG, JU, PAO, BING. This does not consider if the
-     * dst position is valid for the chessman. ChessMan cannot go to a position
-     * occupied by a friend chessman. ChessMan cannot stay at the current position.
+     * This considers only the step direction and length of chessman. This
+     * considers the restrictions on MA, XIANG, JU, PAO, BING. This does not
+     * consider if the dst position is valid for the chessman. ChessMan cannot
+     * go to a position occupied by a friend chessman. ChessMan cannot stay at
+     * the current position.
      * 
      * @param dst
      * @param playground
      * @return reachable
      */
     public boolean canReach(GlobalPosition dst, Playground playground) {
-        if (playground.getChessMan(dst) != null && playground.getChessMan(dst).getColor() == this.color) {
+        if (playground.getChessMan(dst) != null
+                && playground.getChessMan(dst).getColor() == this.color) {
             return false;
         }
         int srcX = currGlobalPosition.getX();
@@ -218,9 +224,11 @@ public class ChessMan {
             }
             GlobalPosition blocker = null;
             if (diffX == 2) {
-                blocker = new GlobalPosition(currGlobalPosition.getY(), (currGlobalPosition.getX() + dst.getX()) / 2);
+                blocker = new GlobalPosition(currGlobalPosition.getY(),
+                        (currGlobalPosition.getX() + dst.getX()) / 2);
             } else {
-                blocker = new GlobalPosition(currGlobalPosition.getX(), (currGlobalPosition.getY() + dst.getY()) / 2);
+                blocker = new GlobalPosition(currGlobalPosition.getX(),
+                        (currGlobalPosition.getY() + dst.getY()) / 2);
             }
             return playground.getChessMan(blocker) == null;
         case JU:
@@ -231,7 +239,8 @@ public class ChessMan {
                 int smallY = Math.min(currGlobalPosition.getY(), dst.getY());
                 int bigY = Math.max(currGlobalPosition.getY(), dst.getY());
                 for (int stepY = smallY + 1; stepY < bigY; stepY++) {
-                    GlobalPosition stepPosition = new GlobalPosition(srcX, stepY);
+                    GlobalPosition stepPosition = new GlobalPosition(srcX,
+                            stepY);
                     if (playground.getChessMan(stepPosition) != null) {
                         return false;
                     }
@@ -240,7 +249,8 @@ public class ChessMan {
                 int smallX = Math.min(srcX, dstX);
                 int bigX = Math.max(srcX, dstX);
                 for (int stepX = smallX + 1; stepX < bigX; stepX++) {
-                    GlobalPosition stepPosition = new GlobalPosition(stepX, dst.getY());
+                    GlobalPosition stepPosition = new GlobalPosition(stepX,
+                            dst.getY());
                     if (playground.getChessMan(stepPosition) != null) {
                         return false;
                     }
@@ -253,10 +263,12 @@ public class ChessMan {
             }
             if (playground.getChessMan(dst) == null) {
                 if (diffX == 0) {
-                    int smallY = Math.min(currGlobalPosition.getY(), dst.getY());
+                    int smallY = Math.min(currGlobalPosition.getY(),
+                            dst.getY());
                     int bigY = Math.max(currGlobalPosition.getY(), dst.getY());
                     for (int stepY = smallY + 1; stepY < bigY; stepY++) {
-                        GlobalPosition stepPosition = new GlobalPosition(srcX, stepY);
+                        GlobalPosition stepPosition = new GlobalPosition(srcX,
+                                stepY);
                         if (playground.getChessMan(stepPosition) != null) {
                             return false;
                         }
@@ -265,7 +277,8 @@ public class ChessMan {
                     int smallX = Math.min(srcX, dstX);
                     int bigX = Math.max(srcX, dstX);
                     for (int stepX = smallX + 1; stepX < bigX; stepX++) {
-                        GlobalPosition stepPosition = new GlobalPosition(stepX, dst.getY());
+                        GlobalPosition stepPosition = new GlobalPosition(stepX,
+                                dst.getY());
                         if (playground.getChessMan(stepPosition) != null) {
                             return false;
                         }
@@ -275,10 +288,12 @@ public class ChessMan {
             } else {
                 int blockerCnt = 0;
                 if (diffX == 0) {
-                    int smallY = Math.min(currGlobalPosition.getY(), dst.getY());
+                    int smallY = Math.min(currGlobalPosition.getY(),
+                            dst.getY());
                     int bigY = Math.max(currGlobalPosition.getY(), dst.getY());
                     for (int stepY = smallY + 1; stepY < bigY; stepY++) {
-                        GlobalPosition stepPosition = new GlobalPosition(srcX, stepY);
+                        GlobalPosition stepPosition = new GlobalPosition(srcX,
+                                stepY);
                         if (playground.getChessMan(stepPosition) != null) {
                             blockerCnt++;
                         }
@@ -287,7 +302,8 @@ public class ChessMan {
                     int smallX = Math.min(srcX, dstX);
                     int bigX = Math.max(srcX, dstX);
                     for (int stepX = smallX + 1; stepX < bigX; stepX++) {
-                        GlobalPosition stepPosition = new GlobalPosition(stepX, dst.getY());
+                        GlobalPosition stepPosition = new GlobalPosition(stepX,
+                                dst.getY());
                         if (playground.getChessMan(stepPosition) != null) {
                             blockerCnt++;
                         }
@@ -305,14 +321,16 @@ public class ChessMan {
     }
 
     private int getInitGlobalPositionX() {
-        int[] MIRRORED_X = new int[] { 3, 5, 2, 6, 1, 7, 0, 8, 1, 7, 0, 2, 4, 6, 8, 4 };
+        int[] MIRRORED_X = new int[] { 3, 5, 2, 6, 1, 7, 0, 8, 1, 7, 0, 2, 4, 6,
+                8, 4 };
         int mirroredId = id % (TOTAL_CHESS_CNT / 2);
         return MIRRORED_X[mirroredId];
     }
 
     private int getInitGlobalPositionY() {
         int mirroredId = id % (TOTAL_CHESS_CNT / 2);
-        int[] MIRRORED_Y = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 3, 3, 3, 3, 3, 0 };
+        int[] MIRRORED_Y = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 3, 3, 3, 3,
+                3, 0 };
         if (id == mirroredId) {
             return MIRRORED_Y[mirroredId];
         } else {
@@ -370,8 +388,10 @@ class GlobalPosition {
     }
 
     private void validate(int x, int y) {
-        if (x < 0 || x > Playground.width - 1 || y < 0 || y > Playground.height - 1) {
-            String msg = String.format("Illegal global position x = %d, y = %d", x, y);
+        if (x < 0 || x > Playground.width - 1 || y < 0
+                || y > Playground.height - 1) {
+            String msg = String.format("Illegal global position x = %d, y = %d",
+                    x, y);
             throw new IllegalArgumentException(msg);
         }
     }

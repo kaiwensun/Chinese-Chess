@@ -7,7 +7,7 @@ package com.skw.app.chess.game;
  *
  */
 public class User {
-	public int age = 30;
-	public int userId = 2;
-	public String name = "myName";
+    public int    age    = 30;
+    public int    userId = 2;
+    public String name   = "myName";
 }
